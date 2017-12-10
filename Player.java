@@ -25,12 +25,12 @@ public class Player
     }
     public int setSpace(int index)
     {
-        space = index % 40;
+        space = index % 39;
         return space;
     }
     public int addSpace(int amount)
     {
-        space = (space + amount) % 40;
+        space = (space + amount) % 39;
         return space;
     }
     public Boolean freeJail() { return freeJail; }

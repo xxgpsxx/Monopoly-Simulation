@@ -73,7 +73,7 @@ public class Simulation
         chance.add(new MoneyCard(150));
         chance.add(new PayEach(50));
         chance.add(new JailCard(false));
-
+        
         shuffle(chance);
 
         community.add(new JailCard(false));
@@ -174,17 +174,20 @@ public class Simulation
     public void landedCommunity(Player player)
     {
         String name = "Player " + player.number();
-        System.out.println(name + " has landed on Community Chance!");
         Card card = chance.get(0);
         chance.add(chance.remove(0));
         if(card instanceof MoneyCard)
         {
             int amount = ((MoneyCard)(card)).amount();
-            player.addMoney(amount);
-            if(amount > 0)
-                System.out.println(name + " gained " + amount + " Dollars and now has "  + player.money() + " Dollars");
-            else
-                System.out.println(name + " lost " + Math.abs(amount) + " Dollars and now has " + player.money() + " Dollars");
+            if(amount < 0) {
+                player.subMoney(amount);
+                System.out.println(name + " lost " + amount + " Dollars and now has " + player.money() + " Dollars");
+            }
+            else {
+                player.addMoney(amount);
+                System.out.println(name + " gained " + amount + " Dollars and now has " + player.money() + " Dollars");
+            }
+
         }
         else if(card instanceof JailCard)
         {
@@ -197,7 +200,6 @@ public class Simulation
     public void landedChance(Player player)
     {
         String name = "Player " + player.number();
-        System.out.println(name + " has landed on Chance!");
         Card card = chance.get(0);
         chance.add(chance.remove(0));
         if(card instanceof MoneyCard)
@@ -240,8 +242,8 @@ public class Simulation
     {
         int amount = ((Transaction)(space(player))).amount();
         String name = "Player " + player.number();
-        player.subMoney(amount);
-        System.out.println(name + " has paid " + amount + " Dollars because of " + space(player).name());
+        player.subMoney(Math.abs(amount));
+        System.out.println(name + " has paid " + Math.abs(amount) + " Dollars because of " + space(player).name());
         System.out.println(name + " has " + player.money() + " Dollars left");
     }
     public Property property(Player player) { return (Property)(space(player)); }
