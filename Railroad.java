@@ -1,10 +1,10 @@
 package mypckg;
 
-public class Railroad extends Property
-{
-    public Railroad(String name, String color, int cost, int houses, int[] rent)
-    {
-        super(name, color, cost, houses, rent);
-    }
-    public void setHouses(int x) { super.setHouses(super.houses()); }
+public class Railroad extends Property {
+    private int cost = 200;
+
+    public Railroad(String name) { super(name, 200, 0); }
+    public int rent(int owned) { return 25 * owned; }
+    public int cost() { return cost; }
+    public String toString() { return super.toString() + " (Railroad)"; }
 }
