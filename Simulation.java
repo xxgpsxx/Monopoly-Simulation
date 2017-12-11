@@ -1,4 +1,3 @@
-package mypckg;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -73,7 +72,7 @@ public class Simulation
         chance.add(new MoneyCard(150));
         chance.add(new PayEach(50));
         chance.add(new JailCard(false));
-        
+
         shuffle(chance);
 
         community.add(new JailCard(false));
@@ -117,10 +116,13 @@ public class Simulation
                 player.subMoney(50);
                 rollDice(player);
             }
-            else if(player.jail() > 0)
+            else if(player.jail() > 0) {
+				inJail(player);
                 player.incJail(1);
+			}
             else
                 rollDice(player);
+            order.add(order.remove(0));
         }
     }
     public void rollDice(Player player)
@@ -133,7 +135,19 @@ public class Simulation
         System.out.println("Press Enter to Role Dice");
         String temp = reader.nextLine();
         System.out.println(name + " Rolled a " + roll[0] + " and a " + roll[1]);
-        player.addSpace(roll[0] + roll[1]);
+       	rolled(player, roll[0], roll[1]);
+    }
+    public void rolled(Player player, int x, int y)
+    {
+		int previous = player.space();
+		player.addSpace(x + y);
+		String name = "Player " + player.number();
+		if((previous + x + y) % 39 != previous + x + y) {
+			System.out.println(name + " has received 200 Dollars for passing Go!");
+			player.addMoney(200);
+
+			System.out.println(name + " now has " + player.money() + " Dollars!");
+		}
         System.out.println(name + " landed on " + spaceName(player) + "!");
         if(space(player) instanceof Property && property(player).owner() == 0)
             landedProperty(player);
@@ -145,7 +159,28 @@ public class Simulation
             landedCommunity(player);
         else if(space(player) instanceof Transaction)
             landedTransaction(player);
-    }
+        else if(space(player) instanceof GoToJail) {
+			System.out.println(name + " has been sent to jail!");
+			player.setSpace(10);
+			player.toJail();
+		}
+	}
+    public void inJail(Player player)
+    {
+		String name = "Player " + player.number();
+		System.out.println(name + " is currently in jail!");
+		System.out.println("Press Enter to roll for doubles");
+		String temp = reader.nextLine();
+		int[] roll = roll();
+		System.out.println(name + " rolled a " + roll[0] + " and a " + roll[1] + "!");
+		if(roll[0] == roll[1]) {
+			System.out.println(name + " has exited jail!");
+			player.exitJail();
+			rolled(player, roll[0], roll[1]);
+		}
+		else
+			System.out.println(name + " is staying in jail.");
+	}
     public void landedProperty(Player player)
     {
         char option = 'a';
@@ -176,6 +211,7 @@ public class Simulation
         String name = "Player " + player.number();
         Card card = chance.get(0);
         chance.add(chance.remove(0));
+        System.out.println(card);
         if(card instanceof MoneyCard)
         {
             int amount = ((MoneyCard)(card)).amount();
@@ -191,10 +227,14 @@ public class Simulation
         }
         else if(card instanceof JailCard)
         {
-            if(((JailCard)(card)).jail())
+            if(((JailCard)(card)).jail()) {
+				System.out.println(name + " has been moved to jail!");
                 player.toJail();
-            else
+			}
+            else {
+				System.out.println(name + " has received a get out of jail card!");
                 player.setFreeJail(true);
+			}
         }
     }
     public void landedChance(Player player)
@@ -202,6 +242,7 @@ public class Simulation
         String name = "Player " + player.number();
         Card card = chance.get(0);
         chance.add(chance.remove(0));
+        System.out.println(card);
         if(card instanceof MoneyCard)
         {
             int amount = ((MoneyCard)(card)).amount();
